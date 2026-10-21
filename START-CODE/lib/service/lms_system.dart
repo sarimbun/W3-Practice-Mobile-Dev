@@ -23,7 +23,10 @@ class LmsSystem {
     }
     // 1- Remove student from the students list
     students.removeWhere((student) => student.id == studentId);
- 
+    
+    for (Course c in courses) {
+      c.studentIds.remove(studentId);
+    }
   }
 
   Student? _findStudentOrNull(String studentId) {
@@ -94,9 +97,9 @@ class LmsSystem {
     }
 
     // Student is not enrolled
-    if (course.studentIds.contains(studentId)) {
-      throw Exception('Student $studentId already enrolled in $courseId');
+    if (!course.studentIds.contains(studentId)) {
+      throw Exception('Student $studentId is not enrolled in course $courseId');
     }
-    course.studentIds.add(studentId);
+    course.studentIds.remove(studentId);
   }
 }

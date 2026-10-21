@@ -95,6 +95,56 @@ void main() {
       throwsException,
     );
   });
- 
- }
 
+  test('remove an existing enrollment', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+    lms.enrollStudent(studentId: 'S1', courseId: 'C1');
+
+    lms.discardStudentFromCourse(studentId:'S1', courseId: 'C1');
+
+    expect(lms.courses.first.studentIds, isEmpty);
+
+    expect(lms.students.length, 1);
+    expect(lms.courses.length, 1);
+
+  });
+ 
+
+ test('rejects removing a nonexistent enrollment', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+
+    expect(
+      () => lms.discardStudentFromCourse(studentId: 'S1', courseId: 'C1'),
+      throwsException,
+    );
+  });
+
+  test('removing a student removes them from all courses', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+
+    lms.addStudent(studentId: 'S2', studentName: 'Sarim');
+    lms.addCourse(courseId: 'C2', courseName: 'Game Development');
+    //enroll students into both courses
+    lms.enrollStudent(studentId: 'S1', courseId: 'C1');
+    lms.enrollStudent(studentId: 'S1', courseId: 'C2');
+
+    lms.enrollStudent(studentId: 'S2', courseId: 'C1');
+    lms.enrollStudent(studentId: 'S2', courseId: 'C2');
+
+    lms.removeStudent(studentId: 'S1');
+
+    expect(lms.courses[0].studentIds, isNot(contains('S1')));
+    expect(lms.courses[1].studentIds, isNot(contains('S1')));
+
+    expect(lms.courses[0].studentIds, contains('S2'));
+    expect(lms.courses[1].studentIds, contains('S2'));
+
+    expect(lms.students.length, 1);
+  });
+ }
