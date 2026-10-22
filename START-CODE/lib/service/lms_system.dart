@@ -30,6 +30,8 @@ class LmsSystem {
     for (Course c in courses) {
       c.studentIds.remove(studentId);
     }
+
+    results.removeWhere((r) => r.studentId == studentId);
   }
 
   Student? _findStudentOrNull(String studentId) {
@@ -55,6 +57,8 @@ class LmsSystem {
       throw Exception('Course $courseId is not found');
     }
     courses.removeWhere((course) => course.id == courseId);
+
+    results.removeWhere((r) => r.courseId == courseId);
   }
 
   Course? _findCourseOrNull(String courseId) {
@@ -104,6 +108,8 @@ class LmsSystem {
       throw Exception('Student $studentId is not enrolled in course $courseId');
     }
     course.studentIds.remove(studentId);
+
+    results.removeWhere((r) => r.studentId == studentId && r.courseId == courseId);
   }
 
 // Task 4: add result
@@ -143,5 +149,23 @@ class LmsSystem {
       
     ));
        _nextResultId++;
+  }
+
+  Result? _findResultOrNull(String resultId) {
+    for (Result r in results) {
+      if (r.id == resultId) {
+        return r;
+      }
+    }
+    return null; // not found
+  }
+
+  void removeResult({required String resultId}) {
+    Result? result = _findResultOrNull(resultId);
+    if (result == null) {
+      throw Exception('Result $resultId not found');
+    }
+
+    results.removeWhere((r) => r.id == resultId);
   }
 }

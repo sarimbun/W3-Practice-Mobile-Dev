@@ -196,7 +196,7 @@ void main() {
     );
   });
 
-  test('Reject an invalid score', () {
+  test('Reject an invalid score above 100', () {
     final lms = LmsSystem();
     lms.addStudent(studentId: 'S1', studentName: 'Ronan');
     lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
@@ -207,6 +207,14 @@ void main() {
       () => lms.addResult(studentId: 'S1', courseId: 'C1', score: 101),
       throwsException,
     );
+  });
+
+  test('Reject a score below 0', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+
+    lms.enrollStudent(studentId: 'S1', courseId: 'C1');
 
     expect(
       () => lms.addResult(studentId: 'S1', courseId: 'C1', score: -1),
@@ -230,4 +238,49 @@ void main() {
 
     expect(lms.results.length, 1);
   });
+
+  test('Remove an existing result', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+
+    lms.enrollStudent(studentId: 'S1', courseId: 'C1');
+
+    lms.addResult(studentId: 'S1', courseId: 'C1', score: 85);
+
+    lms.removeResult(resultId: lms.results.first.id);
+
+    expect(lms.results, isEmpty);
+  });
+
+  test('Reject removal of a nonexistent result', () {
+    final lms = LmsSystem();
+
+    expect(
+      () => lms.removeResult(resultId: '99'),
+      throwsException
+    );
+  });
+
+  test('Verify that the student, course, and unrelated results remain unchanged', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+
+    lms.addStudent(studentId: 'S2', studentName: 'Sarim');
+
+    lms.enrollStudent(studentId: 'S1', courseId: 'C1');
+    lms.enrollStudent(studentId: 'S2', courseId: 'C1');
+
+    lms.addResult(studentId: 'S1', courseId: 'C1', score: 70);
+    lms.addResult(studentId: 'S2', courseId: 'C1', score: 85);
+
+    lms.removeResult(resultId: lms.results.first.id);
+
+    expect(lms.results.length, 1);
+    expect(lms.results.first.studentId, 'S2');
+    expect(lms.students.length, 2);
+    expect(lms.courses.length, 1);
+  });
+
  }
