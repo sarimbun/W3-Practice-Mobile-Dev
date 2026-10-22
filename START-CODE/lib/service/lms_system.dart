@@ -1,9 +1,12 @@
 import '../model/student.dart';
 import '../model/course.dart';
+import '../model/result.dart';
 
 class LmsSystem {
   final List<Student> students = [];
   final List<Course> courses =[];
+  final List<Result> results = [];
+  int _nextResultId = 1;
 
   void addStudent({required String studentId, required String studentName}) {
     // ! Student shall not exist already
@@ -101,5 +104,44 @@ class LmsSystem {
       throw Exception('Student $studentId is not enrolled in course $courseId');
     }
     course.studentIds.remove(studentId);
+  }
+
+// Task 4: add result
+  void addResult({required String studentId, required String courseId, required int score}) {
+    Student? student = _findStudentOrNull(studentId);
+    Course? course = _findCourseOrNull(courseId);
+
+    if (student == null) {
+      throw Exception('There is no student $studentId yet');
+    }
+    
+    if (course == null) {
+      throw Exception('There is no course $courseId yet');
+    }
+
+    if (!course.studentIds.contains(studentId)) {
+      throw Exception('Student $studentId is not enrolled in course $courseId');
+    }
+
+    if (results.any((r) => r.studentId == studentId && r.courseId == courseId)) {
+      throw Exception('Student already has a result');
+    }
+
+    if (score < 0) {
+      throw Exception('Score must be greater than or equal to 0');
+    }
+
+    if (score > 100) {
+      throw Exception('Score must be less than or equal to 100');
+    }
+
+    results.add(Result(
+      id: _nextResultId.toString(),
+      studentId: studentId,
+      courseId: courseId,
+      score: score,
+      
+    ));
+       _nextResultId++;
   }
 }

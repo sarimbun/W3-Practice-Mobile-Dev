@@ -147,4 +147,87 @@ void main() {
 
     expect(lms.students.length, 1);
   });
+
+  test('Add a valid result', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+
+    lms.enrollStudent(studentId: 'S1', courseId: 'C1');
+
+    lms.addResult(studentId: 'S1', courseId: 'C1', score: 85);
+
+    expect(lms.results.length, 1);
+    expect(lms.results.first.score, 85);
+    expect(lms.courses.first.studentIds, contains('S1'));
+  });
+
+  test('Reject a result for a nonexistent student', () {
+    final lms = LmsSystem();
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+
+    expect(
+      () => lms.addResult(studentId: 'S3', courseId: 'C1', score: 85),
+      throwsException,
+    );
+  });
+
+  test('Reject a result for a nonexistent course', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+
+    expect(
+      () => lms.addResult(studentId: 'S1', courseId: 'C3', score: 85),
+      throwsException,
+    );
+  });
+  
+  test('Reject a result for a student who is not enrolled', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+    lms.addStudent(studentId: 'S2', studentName: 'Sarim');
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+
+    lms.enrollStudent(studentId: 'S1', courseId: 'C1');
+
+    expect(
+      () => lms.addResult(studentId: 'S2', courseId: 'C1', score: 85),
+      throwsException,
+    );
+  });
+
+  test('Reject an invalid score', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+
+    lms.enrollStudent(studentId: 'S1', courseId: 'C1');
+
+    expect(
+      () => lms.addResult(studentId: 'S1', courseId: 'C1', score: 101),
+      throwsException,
+    );
+
+    expect(
+      () => lms.addResult(studentId: 'S1', courseId: 'C1', score: -1),
+      throwsException,
+    );
+  });
+
+  test('Test the chosen policy for duplicate results', () {
+    final lms = LmsSystem();
+    lms.addStudent(studentId: 'S1', studentName: 'Ronan');
+    lms.addCourse(courseId: 'C1', courseName: 'Mobile Development');
+
+    lms.enrollStudent(studentId: 'S1', courseId: 'C1');
+
+    lms.addResult(studentId: 'S1', courseId: 'C1', score: 85);
+
+    expect(
+      () => lms.addResult(studentId: 'S1', courseId: 'C1', score: 85),
+      throwsException,
+    );
+
+    expect(lms.results.length, 1);
+  });
  }
